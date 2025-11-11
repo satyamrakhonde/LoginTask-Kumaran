@@ -2,8 +2,12 @@ package com.sampleLogin.userlogin.dtos;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
+@Getter
+@Setter
 public class CreateUserRequest {
 
     @NotBlank

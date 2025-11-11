@@ -8,8 +8,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:4200")
 public class AuthController {
 
     private final UserService userService;
@@ -21,16 +24,20 @@ public class AuthController {
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
         if(req.getUsername().isBlank() || req.getPassword().isBlank()) {
-            return ResponseEntity.badRequest().body("Enter Valid Credentials");
+            return ResponseEntity.badRequest().body(Map.of("error", "Enter Valid Credentials"));
         }
         if(!userService.existsByUsername(req.getUsername())) {
-            return ResponseEntity.status(404).body("User does not exists");
+            return ResponseEntity.status(404).body(Map.of("error", "User does not exists"));
         }
         boolean ok = userService.validateCredentials(req.getUsername(), req.getPassword());
         if(!ok) {
-            return ResponseEntity.status(401).body("Invalid credentials");
+            return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
         }
-        return ResponseEntity.ok("Login successful");
+        User user = userService.getByUsername(req.getUsername());
+        if(user == null) {
+            return ResponseEntity.status(404).body(Map.of("error", "User not found"));
+        }
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/users")
