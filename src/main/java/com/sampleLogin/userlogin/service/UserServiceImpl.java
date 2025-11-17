@@ -4,13 +4,20 @@ import com.sampleLogin.userlogin.dtos.CreateUserRequest;
 import com.sampleLogin.userlogin.entity.User;
 import com.sampleLogin.userlogin.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository repo;
 
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     public UserServiceImpl(UserRepository repo) {
         this.repo = repo;
@@ -24,7 +31,7 @@ public class UserServiceImpl implements UserService{
         }
         User u = new User();
         u.setUsername(req.getUsername());
-        u.setPassword(req.getPassword());
+        u.setPassword(passwordEncoder.encode(req.getPassword()));
         u.setFirstName(req.getFirstName());
         u.setLastName(req.getLastName());
         u.setAge(req.getAge());
